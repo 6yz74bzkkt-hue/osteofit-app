@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Osteoporose Präventionsprogramm</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3a6ea5">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="OsteoFit">
+<style>
+  :root{--primary:#3a6ea5;--primary-dark:#294e78;--bg:#f4f6f9;--card:#ffffff;--text:#222;--muted:#666;--accent:#7fb069;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px;}
+  header{background:var(--primary);color:#fff;padding:18px 16px 14px;text-align:center;position:sticky;top:0;z-index:10;}
+  header h1{margin:0;font-size:1.2rem;}
+  header p{margin:4px 0 0;font-size:0.8rem;opacity:0.85;}
+  main{padding:16px;max-width:600px;margin:0 auto;}
+  .card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+  .card h2{margin:0 0 8px;font-size:1rem;color:var(--primary-dark);}
+  .card p{margin:0;font-size:0.9rem;color:var(--muted);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tile{background:var(--card);border-radius:14px;padding:16px 10px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.08);cursor:pointer;border:none;font-family:inherit;}
+  .tile .emoji{font-size:1.8rem;display:block;margin-bottom:6px;}
+  .tile span.label{font-size:0.85rem;font-weight:600;color:var(--primary-dark);}
+  nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;border-top:1px solid #e2e2e2;padding:6px 0 max(6px, env(safe-area-inset-bottom));z-index:20;}
+  nav.tabbar button{background:none;border:none;font-size:0.7rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;font-family:inherit;}
+  nav.tabbar button.active{color:var(--primary);}
+  nav.tabbar button .icon{font-size:1.3rem;}
+  section.page{display:none;}
+  section.page.active{display:block;}
+  .unit-list{display:flex;flex-direction:column;gap:10px;}
+  .unit{background:var(--card);border-radius:12px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+  .unit summary{font-weight:600;color:var(--primary-dark);cursor:pointer;}
+  .unit ul{margin:8px 0 0;padding-left:18px;font-size:0.88rem;color:var(--text);}
+  form.diary{display:flex;flex-direction:column;gap:10px;}
+  form.diary label{font-size:0.85rem;color:var(--muted);}
+  form.diary input, form.diary select, form.diary textarea{padding:10px;border-radius:8px;border:1px solid #ccc;font-size:0.95rem;}
+  button.primary{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:12px;font-size:0.95rem;font-weight:600;cursor:pointer;width:100%;}
+  .entry{background:#eef3f8;border-radius:10px;padding:10px;font-size:0.85rem;margin-top:8px;}
+  .entry small{color:var(--muted);}
+  .entry ul{margin:4px 0 0;padding-left:18px;}
+  .delete-btn{background:none;border:none;font-size:1rem;cursor:pointer;padding:0 0 0 8px;line-height:1;}
+  .assess-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;}
+  .assess-row:last-child{border-bottom:none;}
+  .assess-row input{width:70px;padding:6px;border-radius:6px;border:1px solid #ccc;}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 18px;border-radius:20px;font-size:0.85rem;opacity:0;transition:opacity .3s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  .exercise-row{display:flex;gap:8px;align-items:center;}
+  .exercise-row .exercise-input{flex:2;}
+  .exercise-row .sets-input{flex:1;min-width:0;}
+  .add-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:1rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>OsteoFit</h1>
+  <p>Präventionsprogramm bei Osteoporose</p>
+</header>
+
+<main>
+
+  <section class="page active" id="page-home">
+    <div class="card">
+      <h2>Willkommen</h2>
+      <p>Diese App begleitet dich durch dein 6-wöchiges Präventionsprogramm mit Übungen, Trainingstagebuch und Assessments.</p>
+    </div>
+    <div class="grid">
+      <button class="tile" onclick="showPage('units')">
+        <span class="emoji">🏋️</span>
+        <span class="label">Kurseinheiten</span>
+      </button>
+      <button class="tile" onclick="showPage('diary')">
+        <span class="emoji">📔</span>
+        <span class="label">Trainingstagebuch</span>
+      </button>
+      <button class="tile" onclick="showPage('assess')">
+        <span class="emoji">📏</span>
+        <span class="label">Assessments</span>
+      </button>
+      <button class="tile" onclick="showPage('info')">
+        <span class="emoji">ℹ️</span>
+        <span class="label">Infos zu Osteoporose</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="page" id="page-units">
+    <div class="card"><h2>Die 6 Kurseinheiten</h2><p>Tippe auf eine Einheit, um Inhalte und Übungen zu sehen.</p></div>
+    <div class="unit-list" id="unitList"></div>
+  </section>
+
+  <section class="page" id="page-diary">
+    <div class="card">
+      <h2>Trainingstagebuch</h2>
+      <form class="diary" id="diaryForm">
+        <label>Datum
+          <input type="date" id="d-date" required>
+        </label>
+        <label>Übungen (mit Sätzen x Wiederholungen)</label>
+        <div id="exerciseFields">
+          <div class="exercise-row">
+            <input type="text" class="exercise-input" placeholder="z.B. Kniebeuge" required>
+            <input type="text" class="sets-input" placeholder="3x10">
+            <button type="button" class="add-btn" onclick="addExerciseField()">+</button>
+          </div>
+        </div>
+        <label>Wie hat es sich angefühlt?
+          <select id="d-feeling">
+            <option>Gut</option>
+            <option>Okay</option>
+            <option>Anstrengend</option>
+            <option>Schmerzen</option>
+          </select>
+        </label>
+        <label>Notizen
+          <textarea id="d-notes" rows="2" placeholder="optional"></textarea>
+        </label>
+        <button type="submit" class="primary">Eintrag speichern</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Bisherige Einträge</h2>
+      <div id="diaryEntries"></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-assess">
+    <div class="card">
+      <h2>Assessments</h2>
+      <p>Trage deine Testergebnisse ein, um deinen Fortschritt zu sehen.</p>
+      <div class="assess-row"><span>30-Second Chair Stand (Wdh.)</span><input type="number" id="a-chair"></div>
+      <div class="assess-row"><span>Single Leg Stance (Sek.)</span><input type="number" id="a-leg"></div>
+      <button class="primary" style="margin-top:12px;" onclick="saveAssessment()">Ergebnis speichern</button>
+    </div>
+    <div class="card">
+      <h2>Verlauf</h2>
+      <div id="assessHistory"></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-info">
+    <div class="card">
+      <h2>Was ist Osteoporose?</h2>
+      <p>Osteoporose ist eine systemische Skeletterkrankung mit verringerter Knochenmasse und erhöhtem Frakturrisiko, die vor allem postmenopausale Frauen betrifft.</p>
+    </div>
+    <div class="card">
+      <h2>Ziele des Programms</h2>
+      <p>Verbesserung von Muskelkraft, Gleichgewicht, Gangbild und Körperhaltung sowie Reduktion des Sturz- und Frakturrisikos.</p>
+    </div>
+    <div class="card">
+      <h2>Wichtige Hinweise</h2>
+      <p>Vermeide Rumpfbeugen der Brustwirbelsäule. Wähle Übungen mit hoher mechanischer Knochenbelastung (Gehen, Treppensteigen, Krafttraining) und trainiere regelmäßig, auch nach Programmende.</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<nav class="tabbar">
+  <button class="active" data-page="home" onclick="showPage('home')">Start</button>
+  <button data-page="units" onclick="showPage('units')">Einheiten</button>
+  <button data-page="diary" onclick="showPage('diary')">Tagebuch</button>
+  <button data-page="assess" onclick="showPage('assess')">Tests</button>
+  <button data-page="info" onclick="showPage('info')">Info</button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
